@@ -1,0 +1,133 @@
+"use client"
+
+import type React from "react"
+
+import { useState, useEffect } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { supabase, type Database } from "@/lib/supabase"
+
+type Contact = Database["public"]["Tables"]["contacts"]["Row"]
+
+interface EditContactFormProps {
+  contact: Contact
+  open: boolean
+  onClose: () => void
+  onSuccess: () => void
+}
+
+export function EditContactForm({ contact, open, onClose, onSuccess }: EditContactFormProps) {
+  const [name, setName] = useState("")
+  const [email, setEmail] = useState("")
+  const [phone, setPhone] = useState("")
+  const [address, setAddress] = useState("")
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (contact) {
+      setName(contact.name)
+      setEmail(contact.email)
+      setPhone(contact.phone)
+      setAddress(contact.address || "")
+    }
+  }, [contact])
+
+  const validateEmail = (email: string) => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  }
+
+  const validatePhone = (phone: string) => {
+    return /^\+?\d{9,}$/.test(phone)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!name || !email || !phone) {
+      alert("Por favor complete los campos obligatorios")
+      return
+    }
+
+    if (!validateEmail(email) || !validatePhone(phone)) {
+      alert("Por favor ingrese un email y teléfono válidos")
+      return
+    }
+
+    setLoading(true)
+    try {
+      const { error } = await supabase
+        .from("contacts")
+        .update({
+          name: name.trim(),
+          email: email.trim(),
+          phone: phone.trim(),
+          address: address.trim() || null,
+        })
+        .eq("id", contact.id)
+
+      if (error) throw error
+
+      onSuccess()
+      onClose()
+    } catch (error) {
+      console.error("Error updating contact:", error)
+      alert("Error al actualizar el contacto")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle>Editar Contacto</DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="text-sm font-medium">Nombre *</label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Nombre completo" required />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Teléfono *</label>
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+34..." required />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Email *</label>
+            <Input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="email@ejemplo.com"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="text-sm font-medium">Dirección</label>
+            <Textarea
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              placeholder="Dirección completa"
+              rows={2}
+            />
+          </div>
+
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={onClose}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Guardando..." : "Guardar Cambios"}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
