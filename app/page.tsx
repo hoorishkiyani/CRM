@@ -3,11 +3,12 @@
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Plus, RotateCcw } from "lucide-react"
+import { Plus, RotateCcw, Settings } from "lucide-react"
 import { PipelineBoard } from "@/components/pipeline-board"
 import { ActivitiesList } from "@/components/activities-list"
 import { ContactsTable } from "@/components/contacts-table"
 import { AddLeadForm } from "@/components/add-lead-form"
+import { IntegrationStatus } from "@/components/integration-status"
 import { EnvironmentCheck } from "@/components/environment-check"
 
 export default function CRMDashboard() {
@@ -51,10 +52,14 @@ export default function CRMDashboard() {
         </div>
 
         <Tabs defaultValue="pipeline" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
-            <TabsTrigger value="activities">Historial de Actividades</TabsTrigger>
+            <TabsTrigger value="activities">Actividades</TabsTrigger>
             <TabsTrigger value="contacts">Contactos</TabsTrigger>
+            <TabsTrigger value="integrations">
+              <Settings className="h-4 w-4 mr-2" />
+              Integraciones
+            </TabsTrigger>
             <TabsTrigger value="reports">Informes</TabsTrigger>
           </TabsList>
 
@@ -70,10 +75,16 @@ export default function CRMDashboard() {
             <ContactsTable key={refreshKey} onRefresh={handleRefresh} />
           </TabsContent>
 
+          <TabsContent value="integrations" className="mt-6">
+            <IntegrationStatus />
+          </TabsContent>
+
           <TabsContent value="reports" className="mt-6">
             <div className="text-center p-8">
-              <h2 className="text-2xl font-bold mb-4">Informes</h2>
-              <p className="text-muted-foreground">Los informes y análisis estarán disponibles próximamente.</p>
+              <h2 className="text-2xl font-bold mb-4">Informes y Análisis</h2>
+              <p className="text-muted-foreground">
+                Los informes detallados y análisis de rendimiento estarán disponibles próximamente.
+              </p>
             </div>
           </TabsContent>
         </Tabs>
