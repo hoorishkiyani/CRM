@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Plus, RotateCcw } from "lucide-react"
@@ -12,9 +12,24 @@ import { AddLeadForm } from "@/components/add-lead-form"
 export default function CRMDashboard() {
   const [showAddLead, setShowAddLead] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleRefresh = () => {
     setRefreshKey((prev) => prev + 1)
+  }
+
+  if (!mounted) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="flex justify-center items-center min-h-screen">
+          <div className="text-lg">Cargando CRM...</div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -61,7 +76,9 @@ export default function CRMDashboard() {
         </TabsContent>
       </Tabs>
 
-      <AddLeadForm open={showAddLead} onClose={() => setShowAddLead(false)} onSuccess={handleRefresh} />
+      {showAddLead && (
+        <AddLeadForm open={showAddLead} onClose={() => setShowAddLead(false)} onSuccess={handleRefresh} />
+      )}
     </div>
   )
 }

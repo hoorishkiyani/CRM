@@ -10,9 +10,10 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "latest",
-    "@radix-ui/react-dialog": "^1.0.5",
-    "@radix-ui/react-select": "^2.0.0",
-    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-dialog": "latest",
+    "@radix-ui/react-select": "latest",
+    "@radix-ui/react-slot": "latest",
+    "@radix-ui/react-tabs": "latest",
     "@supabase/supabase-js": "latest",
     "ai": "latest",
     "class-variance-authority": "^0.7.1",
