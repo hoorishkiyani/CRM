@@ -3,18 +3,21 @@
 import { useState, useEffect } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
-import { Plus, RotateCcw, Settings } from "lucide-react"
+import { Plus, RotateCcw, Settings, Move, Database } from "lucide-react"
 import { PipelineBoard } from "@/components/pipeline-board"
+import { DragDropPipeline } from "@/components/drag-drop-pipeline"
 import { ActivitiesList } from "@/components/activities-list"
 import { ContactsTable } from "@/components/contacts-table"
 import { AddLeadForm } from "@/components/add-lead-form"
 import { IntegrationStatus } from "@/components/integration-status"
+import { SupabaseStatus } from "@/components/supabase-status"
 import { EnvironmentCheck } from "@/components/environment-check"
 
 export default function CRMDashboard() {
   const [showAddLead, setShowAddLead] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
   const [mounted, setMounted] = useState(false)
+  const [viewMode, setViewMode] = useState<"dropdown" | "drag">("drag")
 
   useEffect(() => {
     setMounted(true)
@@ -52,10 +55,14 @@ export default function CRMDashboard() {
         </div>
 
         <Tabs defaultValue="pipeline" className="w-full">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="grid w-full grid-cols-6">
             <TabsTrigger value="pipeline">Pipeline</TabsTrigger>
             <TabsTrigger value="activities">Actividades</TabsTrigger>
             <TabsTrigger value="contacts">Contactos</TabsTrigger>
+            <TabsTrigger value="database">
+              <Database className="h-4 w-4 mr-2" />
+              Base de Datos
+            </TabsTrigger>
             <TabsTrigger value="integrations">
               <Settings className="h-4 w-4 mr-2" />
               Integraciones
@@ -64,7 +71,32 @@ export default function CRMDashboard() {
           </TabsList>
 
           <TabsContent value="pipeline" className="mt-6">
-            <PipelineBoard key={refreshKey} onRefresh={handleRefresh} />
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold">Pipeline de Ventas</h2>
+              <div className="flex gap-2">
+                <Button
+                  variant={viewMode === "drag" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("drag")}
+                >
+                  <Move className="h-4 w-4 mr-2" />
+                  Arrastrar y Soltar
+                </Button>
+                <Button
+                  variant={viewMode === "dropdown" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setViewMode("dropdown")}
+                >
+                  Lista con Dropdown
+                </Button>
+              </div>
+            </div>
+
+            {viewMode === "drag" ? (
+              <DragDropPipeline key={refreshKey} onRefresh={handleRefresh} />
+            ) : (
+              <PipelineBoard key={refreshKey} onRefresh={handleRefresh} />
+            )}
           </TabsContent>
 
           <TabsContent value="activities" className="mt-6">
@@ -73,6 +105,10 @@ export default function CRMDashboard() {
 
           <TabsContent value="contacts" className="mt-6">
             <ContactsTable key={refreshKey} onRefresh={handleRefresh} />
+          </TabsContent>
+
+          <TabsContent value="database" className="mt-6">
+            <SupabaseStatus />
           </TabsContent>
 
           <TabsContent value="integrations" className="mt-6">
