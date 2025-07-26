@@ -11,7 +11,7 @@ export async function generateReply(
 ) {
   try {
     const { text } = await generateText({
-      model: openai("gpt-4o-mini"),
+      model: openai({ apiKey: process.env.OPENAI_API_KEY, model: "gpt-4o-mini" }),
       system: `Eres un asistente de ventas profesional para Neon 51, una empresa que fabrica productos de neón personalizados como letreros, cuadros neón, letras corpóreas y espejos infinitos. 
 
 Tu tarea es generar respuestas profesionales y útiles para clientes potenciales. Mantén un tono amigable pero profesional, y siempre busca avanzar la conversación hacia una venta o reunión.
